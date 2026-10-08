@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Produktivitas Minimalis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-700 flex flex-col justify-between selection:bg-indigo-100 selection:text-indigo-700">
+
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center text-white font-bold shadow-md shadow-indigo-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-800 text-lg leading-tight">Fokus & Produktif</h1>
+                    <p class="text-xs text-slate-400" id="current-date-header">Memuat tanggal...</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="openTab('dashboard')" id="nav-dashboard" class="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-50 text-indigo-600 transition-all">Dashboard</button>
+                <button onclick="openTab('analytics')" id="nav-analytics" class="px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 transition-all">Statistik</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- Dashboard Tab View -->
+        <div id="tab-dashboard" class="space-y-8">
+            <!-- Top Row: Pomodoro Timer & Quick Stats -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Pomodoro Timer Card (Span 2 cols on lg) -->
+                <div class="lg:col-span-2 bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-50 rounded-full blur-2xl pointer-events-none"></div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                                Pomodoro Focus Timer
+                            </h2>
+                            <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+                                <button onclick="setTimerMode('work')" id="mode-work" class="px-3 py-1.5 rounded-lg bg-white text-indigo-600 shadow-sm transition-all">Fokus (25m)</button>
+                                <button onclick="setTimerMode('shortBreak')" id="mode-shortBreak" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-700 transition-all">Istirahat Pendek (5m)</button>
+                                <button onclick="setTimerMode('longBreak')" id="mode-longBreak" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-700 transition-all">Istirahat Panjang (15m)</button>
+                            </div>
+                        </div>
+
+                        <!-- Timer Display -->
+                        <div class="flex flex-col items-center justify-center py-6">
+                            <div class="text-6xl sm:text-8xl font-black text-slate-800 tracking-tight mb-2 font-mono" id="timer-display">25:00</div>
+                            <p class="text-sm text-slate-400 font-medium tracking-wide uppercase" id="timer-status-text">Waktu untuk Fokus</p>
+                        </div>
+                    </div>
+
+                    <!-- Timer Controls -->
+                    <div class="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-slate-50">
+                        <button onclick="toggleTimer()" id="btn-start" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-100 transition-all flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span id="btn-start-text">Mulai</span>
+                        </button>
+                        <button onclick="resetTimer()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold rounded-xl transition-all flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Summary / Motivation Card -->
+                <div class="bg-gradient-to-br from-indigo-500 to-violet-600 text-white rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute right-0 top-0 translate-x-4 -translate-y-4 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold tracking-wide">Ringkasan Hari Ini</span>
+                            <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Tetap Semangat & Fokus!</h3>
+                        <p class="text-indigo-100 text-sm leading-relaxed" id="daily-quote">"Kunci produktivitas bukanlah melakukan lebih banyak hal, tetapi melakukan hal-hal yang benar."</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/10">
+                        <div>
+                            <span class="text-xs text-indigo-200 block">Tugas Selesai</span>
+                            <span class="text-2xl font-bold" id="stat-tasks-done">0/0</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-indigo-200 block">Sesi Fokus</span>
+                            <span class="text-2xl font-bold" id="stat-pomos">0</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Second Row: To-Do List & Habit Tracker -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- To-Do List Section -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                                Daftar Tugas (To-Do)
+                            </h2>
+                            <div class="flex items-center space-x-2">
+                                <select id="todo-filter" onchange="renderTodos()" class="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-indigo-500 font-medium text-slate-600">
+                                    <option value="all">Semua Kategori</option>
+                                    <option value="Pekerjaan">Pekerjaan</option>
+                                    <option value="Belajar">Belajar</option>
+                                    <option value="Pribadi">Pribadi</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Add Task Form -->
+                        <form onsubmit="addTodo(event)" class="space-y-3 mb-6">
+                            <div class="flex gap-2">
+                                <input type="text" id="todo-input" placeholder="Tulis tugas baru..." required class="flex-grow bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 text-slate-700 placeholder-slate-400">
+                                <select id="todo-category" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 text-slate-600 font-medium">
+                                    <option value="Pekerjaan">Pekerjaan</option>
+                                    <option value="Belajar">Belajar</option>
+                                    <option value="Pribadi">Pribadi</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Todo Items List -->
+                        <div class="space-y-2.5 max-h-[300px] overflow-y-auto pr-1" id="todo-list-container">
+                            <!-- Populated via JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-50 flex justify-between items-center text-xs text-slate-400 font-medium">
+                        <span id="todo-counter">0 dari 0 tugas selesai</span>
+                        <button onclick="clearCompletedTodos()" class="hover:text-rose-600 transition-colors">Hapus Tugas Selesai</button>
+                    </div>
+                </div>
+
+                <!-- Habit Tracker Section -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                Pelacak Kebiasaan (Habit Tracker)
+                            </h2>
+                            <button onclick="openAddHabitModal()" class="text-xs bg-emerald-50 text-emerald-600 hover:bg-emerald-100 font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Kebiasaan Baru
+                            </button>
+                        </div>
+
+                        <!-- Habit Matrix Table Container -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-100 text-xs font-semibold text-slate-400">
+                                        <th class="pb-3 font-medium">Kebiasaan</th>
+                                        <th class="pb-3 text-center font-medium w-10">Sen</th>
+                                        <th class="pb-3 text-center font-medium w-10">Sel</th>
+                                        <th class="pb-3 text-center font-medium w-10">Rab</th>
+                                        <th class="pb-3 text-center font-medium w-10">Kam</th>
+                                        <th class="pb-3 text-center font-medium w-10">Jum</th>
+                                        <th class="pb-3 text-center font-medium w-10">Sab</th>
+                                        <th class="pb-3 text-center font-medium w-10">Min</th>
+                                        <th class="pb-3 text-center font-medium w-10"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="habit-table-body" class="text-sm">
+                                    <!-- Populated via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-50 text-xs text-slate-400 font-medium">
+                        Klik pada kotak hari untuk menandai kebiasaan selesai minggu ini.
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Third Row: Daily Notes & Journal -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        Catatan Harian & Jurnal Refleksi
+                    </h2>
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <input type="date" id="journal-date" onchange="loadJournalEntry()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-600 focus:outline-none focus:border-indigo-500">
+                        <button onclick="saveJournalEntry()" class="bg-slate-800 hover:bg-slate-900 text-white font-medium px-4 py-2 rounded-xl text-xs transition-all shadow-sm flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                            Simpan Catatan
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <input type="text" id="journal-title" placeholder="Judul hari ini (Misal: Hari penuh produktivitas)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-indigo-500 text-slate-800 placeholder-slate-400">
+                    <textarea id="journal-content" rows="4" placeholder="Tuliskan refleksi, hal yang disyukuri, atau catatan penting hari ini..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:border-indigo-500 text-slate-700 placeholder-slate-400 leading-relaxed resize-y"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Tab View -->
+        <div id="tab-analytics" class="hidden space-y-8">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                    Statistik & Analisis Produktivitas
+                </h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                        <span class="text-xs text-slate-400 font-medium block mb-1">Total Sesi Pomodoro</span>
+                        <div class="text-3xl font-black text-indigo-600" id="analytics-total-pomos">0</div>
+                        <span class="text-xs text-slate-500 mt-2 block">Setara dengan <span id="analytics-total-hours">0</span> jam fokus</span>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                        <span class="text-xs text-slate-400 font-medium block mb-1">Tugas Selesai</span>
+                        <div class="text-3xl font-black text-emerald-600" id="analytics-total-todos">0</div>
+                        <span class="text-xs text-slate-500 mt-2 block">Tugas telah diselesaikan</span>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                        <span class="text-xs text-slate-400 font-medium block mb-1">Kebiasaan Aktif</span>
+                        <div class="text-3xl font-black text-amber-600" id="analytics-total-habits">0</div>
+                        <span class="text-xs text-slate-500 mt-2 block">Target habit minggu ini</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-100 pt-6 flex justify-between items-center">
+                    <p class="text-sm text-slate-500">Semua data tersimpan otomatis di penyimpanan lokal browser Anda.</p>
+                    <button onclick="resetAllData()" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-xl text-xs transition-all">Reset Seluruh Data</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Add Habit -->
+    <div id="habit-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-xl border border-slate-100 animate-in fade-in zoom-in duration-200">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Tambah Kebiasaan Baru</h3>
+            <form onsubmit="addHabit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">Nama Kebiasaan</label>
+                    <input type="text" id="habit-name-input" placeholder="Misal: Olahraga 15 Menit, Membaca Buku..." required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 text-slate-700">
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeAddHabitModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium rounded-xl text-sm transition-all">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl text-sm transition-all shadow-sm">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl z-50 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3">
+        <div id="toast-icon" class="text-indigo-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <span id="toast-message" class="text-sm font-medium">Pesan notifikasi</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-100 bg-white py-6 mt-12 text-center text-xs text-slate-400 font-medium">
+        <p>Dashboard Produktivitas Minimalis &bull; Dirancang untuk Fokus & Ketenangan</p>
+    </footer>
+
+    <script>
+        // State Management
+        let state = {
+            todos: JSON.parse(localStorage.getItem('prod_todos')) || [
+                { id: 1, text: 'Menyusun laporan mingguan', category: 'Pekerjaan', completed: false },
+                { id: 2, text: 'Membaca 1 bab buku pengembangan diri', category: 'Belajar', completed: true },
+                { id: 3, text: 'Meditasi pagi 10 menit', category: 'Pribadi', completed: false }
+            ],
+            habits: JSON.parse(localStorage.getItem('prod_habits')) || [
+                { id: 1, name: 'Olahraga', days: [false, true, false, false, false, false, false] },
+                { id: 2, name: 'Membaca Buku', days: [true, true, true, false, false, false, false] },
+                { id: 3, name: 'Minum 2L Air', days: [true, true, true, true, false, false, false] }
+            ],
+            journals: JSON.parse(localStorage.getItem('prod_journals')) || {},
+            timer: {
+                mode: 'work', // work, shortBreak, longBreak
+                timeLeft: 25 * 60,
+                isRunning: false,
+                interval: null,
+                totalPomos: parseInt(localStorage.getItem('prod_total_pomos')) || 0
+            }
+        };
+
+        const TIMER_DURATIONS = {
+            work: 25 * 60,
+            shortBreak: 5 * 60,
+            longBreak: 15 * 60
+        };
+
+        const DAY_NAMES = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            updateHeaderDate();
+            renderTodos();
+            renderHabits();
+            initJournalDate();
+            updateStats();
+        });
+
+        // Date Header
+        function updateHeaderDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const todayStr = new Date().toLocaleDateString('id-ID', options);
+            document.getElementById('current-date-header').textContent = todayStr;
+        }
+
+        // Tab Navigation
+        function openTab(tabName) {
+            const dashboardTab = document.getElementById('tab-dashboard');
+            const analyticsTab = document.getElementById('tab-analytics');
+            const navDashboard = document.getElementById('nav-dashboard');
+            const navAnalytics = document.getElementById('nav-analytics');
+
+            if (tabName === 'dashboard') {
+                dashboardTab.classList.remove('hidden');
+                analyticsTab.classList.add('hidden');
+                navDashboard.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-indigo-50 text-indigo-600 transition-all';
+                navAnalytics.className = 'px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 transition-all';
+            } else {
+                dashboardTab.classList.add('hidden');
+                analyticsTab.classList.remove('hidden');
+                navAnalytics.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-indigo-50 text-indigo-600 transition-all';
+                navDashboard.className = 'px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 transition-all';
+                updateAnalyticsData();
+            }
+        }
+
+        // --- POMODORO TIMER LOGIC ---
+        function setTimerMode(mode) {
+            if (state.timer.isRunning) {
+                clearInterval(state.timer.interval);
+                state.timer.isRunning = false;
+                document.getElementById('btn-start-text').textContent = 'Mulai';
+            }
+            state.timer.mode = mode;
+            state.timer.timeLeft = TIMER_DURATIONS[mode];
+            
+            // Update UI buttons
+            ['work', 'shortBreak', 'longBreak'].forEach(m => {
+                const btn = document.getElementById(`mode-${m}`);
+                if (m === mode) {
+                    btn.className = 'px-3 py-1.5 rounded-lg bg-white text-indigo-600 shadow-sm transition-all';
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-700 transition-all';
+                }
+            });
+
+            const statusText = {
+                work: 'Waktu untuk Fokus',
+                shortBreak: 'Waktu Istirahat Pendek',
+                longBreak: 'Waktu Istirahat Panjang'
+            }[mode];
+
+            document.getElementById('timer-status-text').textContent = statusText;
+            updateTimerDisplay();
+        }
+
+        function toggleTimer() {
+            if (state.timer.isRunning) {
+                clearInterval(state.timer.interval);
+                state.timer.isRunning = false;
+                document.getElementById('btn-start-text').textContent = 'Mulai';
+            } else {
+                state.timer.isRunning = true;
+                document.getElementById('btn-start-text').textContent = 'Jeda';
+                state.timer.interval = setInterval(() => {
+                    if (state.timer.timeLeft > 0) {
+                        state.timer.timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(state.timer.interval);
+                        state.timer.isRunning = false;
+                        document.getElementById('btn-start-text').textContent = 'Mulai';
+                        playAlarmSound();
+                        
+                        if (state.timer.mode === 'work') {
+                            state.timer.totalPomos++;
+                            localStorage.setItem('prod_total_pomos', state.timer.totalPomos);
+                            showToast('Sesi fokus selesai! Waktu beristirahat sebentar.');
+                        } else {
+                            showToast('Waktu istirahat selesai! Siap kembali fokus?');
+                        }
+                        updateStats();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            if (state.timer.isRunning) {
+                clearInterval(state.timer.interval);
+                state.timer.isRunning = false;
+                document.getElementById('btn-start-text').textContent = 'Mulai';
+            }
+            state.timer.timeLeft = TIMER_DURATIONS[state.timer.mode];
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(state.timer.timeLeft / 60);
+            const seconds = state.timer.timeLeft % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timer-display').textContent = display;
+            document.title = `${display} - Dashboard Produktivitas`;
+        }
+
+        function playAlarmSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5 note
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.6);
+            } catch (e) {
+                console.log('Audio Context error', e);
+            }
+        }
+
+        // --- TO-DO LIST LOGIC ---
+        function saveTodos() {
+            localStorage.setItem('prod_todos', JSON.stringify(state.todos));
+            updateStats();
+        }
+
+        function addTodo(e) {
+            e.preventDefault();
+            const input = document.getElementById('todo-input');
+            const category = document.getElementById('todo-category');
+            
+            const newTodo = {
+                id: Date.now(),
+                text: input.value.trim(),
+                category: category.value,
+                completed: false
+            };
+
+            state.todos.unshift(newTodo);
+            input.value = '';
+            saveTodos();
+            renderTodos();
+            showToast('Tugas berhasil ditambahkan!');
+        }
+
+        function toggleTodo(id) {
+            const todo = state.todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = !todo.completed;
+                saveTodos();
+                renderTodos();
+            }
+        }
+
+        function deleteTodo(id) {
+            state.todos = state.todos.filter(t => t.id !== id);
+            saveTodos();
+            renderTodos();
+        }
+
+        function clearCompletedTodos() {
+            state.todos = state.todos.filter(t => !t.completed);
+            saveTodos();
+            renderTodos();
+            showToast('Tugas selesai dibersihkan!');
+        }
+
+        function renderTodos() {
+            const container = document.getElementById('todo-list-container');
+            const filter = document.getElementById('todo-filter').value;
+            
+            let filtered = state.todos;
+            if (filter !== 'all') {
+                filtered = state.todos.filter(t => t.category === filter);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400 text-xs">
+                        Tidak ada tugas yang ditemukan.
+                    </div>
+                `;
+            } else {
+                container.innerHTML = filtered.map(t => `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-all group">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" ${t.completed ? 'checked' : ''} onclick="toggleTodo(${t.id})" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+                            <div>
+                                <span class="text-sm ${t.completed ? 'line-through text-slate-400' : 'text-slate-700'} font-medium block">${escapeHtml(t.text)}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold ${getCategoryBadgeStyle(t.category)}">${t.category}</span>
+                            </div>
+                        </div>
+                        <button onclick="deleteTodo(${t.id})" class="text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all p-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            // Update counter
+            const completedCount = state.todos.filter(t => t.completed).length;
+            document.getElementById('todo-counter').textContent = `${completedCount} dari ${state.todos.length} tugas selesai`;
+            document.getElementById('stat-tasks-done').textContent = `${completedCount}/${state.todos.length}`;
+        }
+
+        function getCategoryBadgeStyle(cat) {
+            switch(cat) {
+                case 'Pekerjaan': return 'bg-indigo-50 text-indigo-600';
+                case 'Belajar': return 'bg-emerald-50 text-emerald-600';
+                case 'Pribadi': return 'bg-amber-50 text-amber-600';
+                default: return 'bg-slate-100 text-slate-600';
+            }
+        }
+
+        // --- HABIT TRACKER LOGIC ---
+        function saveHabits() {
+            localStorage.setItem('prod_habits', JSON.stringify(state.habits));
+        }
+
+        function openAddHabitModal() {
+            document.getElementById('habit-modal').classList.remove('hidden');
+            document.getElementById('habit-name-input').focus();
+        }
+
+        function closeAddHabitModal() {
+            document.getElementById('habit-modal').classList.add('hidden');
+            document.getElementById('habit-name-input').value = '';
+        }
+
+        function addHabit(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('habit-name-input');
+            const newHabit = {
+                id: Date.now(),
+                name: nameInput.value.trim(),
+                days: [false, false, false, false, false, false, false]
+            };
+            state.habits.push(newHabit);
+            saveHabits();
+            renderHabits();
+            closeAddHabitModal();
+            showToast('Kebiasaan baru ditambahkan!');
+        }
+
+        function toggleHabitDay(habitId, dayIndex) {
+            const habit = state.habits.find(h => h.id === habitId);
+            if (habit) {
+                habit.days[dayIndex] = !habit.days[dayIndex];
+                saveHabits();
+                renderHabits();
+            }
+        }
+
+        function deleteHabit(habitId) {
+            state.habits = state.habits.filter(h => h.id !== habitId);
+            saveHabits();
+            renderHabits();
+        }
+
+        function renderHabits() {
+            const tbody = document.getElementById('habit-table-body');
+            if (state.habits.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-6 text-slate-400 text-xs">Belum ada kebiasaan yang dilacak.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = state.habits.map(h => `
+                <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td class="py-3 font-medium text-slate-700 text-sm">${escapeHtml(h.name)}</td>
+                    ${h.days.map((checked, index) => `
+                        <td class="py-3 text-center">
+                            <button onclick="toggleHabitDay(${h.id}, ${index})" class="w-6 h-6 rounded-lg border transition-all flex items-center justify-center mx-auto ${checked ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-100' : 'border-slate-200 bg-white hover:border-slate-300'}">
+                                ${checked ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                            </button>
+                        </td>
+                    `).join('')}
+                    <td class="py-3 text-center">
+                        <button onclick="deleteHabit(${h.id})" class="text-slate-300 hover:text-rose-500 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- JOURNAL LOGIC ---
+        function getFormattedDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function initJournalDate() {
+            const todayStr = getFormattedDate(new Date());
+            document.getElementById('journal-date').value = todayStr;
+            loadJournalEntry();
+        }
+
+        function loadJournalEntry() {
+            const dateStr = document.getElementById('journal-date').value;
+            const entry = state.journals[dateStr] || { title: '', content: '' };
+            document.getElementById('journal-title').value = entry.title;
+            document.getElementById('journal-content').value = entry.content;
+        }
+
+        function saveJournalEntry() {
+            const dateStr = document.getElementById('journal-date').value;
+            const title = document.getElementById('journal-title').value.trim();
+            const content = document.getElementById('journal-content').value.trim();
+
+            state.journals[dateStr] = { title, content };
+            localStorage.setItem('prod_journals', JSON.stringify(state.journals));
+            showToast('Catatan harian berhasil disimpan!');
+        }
+
+        // --- STATS & ANALYTICS ---
+        function updateStats() {
+            document.getElementById('stat-pomos').textContent = state.timer.totalPomos;
+        }
+
+        function updateAnalyticsData() {
+            document.getElementById('analytics-total-pomos').textContent = state.timer.totalPomos;
+            document.getElementById('analytics-total-hours').textContent = (state.timer.totalPomos * 25 / 60).toFixed(1);
+            document.getElementById('analytics-total-todos').textContent = state.todos.filter(t => t.completed).length;
+            document.getElementById('analytics-total-habits').textContent = state.habits.length;
+        }
+
+        function resetAllData() {
+            if (confirm('Apakah Anda yakin ingin mereset seluruh data aplikasi? Tindakan ini tidak dapat dibatalkan.')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Utility: Toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Utility: HTML escape
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
